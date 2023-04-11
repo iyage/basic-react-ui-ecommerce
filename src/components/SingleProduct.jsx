@@ -1,6 +1,8 @@
 import { Add, Remove } from "@mui/icons-material";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
+import { Popularproducts, UserCart } from "./data";
 
 const Wrapper = styled.div`
   width: 97%;
@@ -159,52 +161,112 @@ const Container = styled.div`
 `;
 
 function SingleProduct() {
+  const [prod, setProd] = useState([]);
+  const { id } = useParams();
+  const [qty, setQty] = useState(1);
+  const [color, setColor] = useState("blue");
+  const [size, setSize] = useState("xs");
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    setProd(
+      Popularproducts.filter((prod) => {
+        return prod.id == id;
+      })
+    );
+  }, []);
+  function handleCart(evt) {
+    if (evt === "add") {
+      setQty((prev) => (prev += 1));
+    } else {
+      if (qty > 0) setQty((prev) => (prev -= 1));
+    }
+  }
+  function addToCart() {
+    UserCart.push({
+      id: 5087467 + 10,
+      prodName: prod[0].name,
+      color: color,
+      size: size,
+      price: prod[0].price,
+      qty: qty,
+      img: prod[0].img,
+    });
+  }
   return (
     <Container>
       <Wrapper>
-        <ProdImgContainer>
-          <Img src="https://m.media-amazon.com/images/I/61ZRokmuQOL._AC_UX679_.jpg" />
-        </ProdImgContainer>
-        <ProdInfo>
-          <ProdName>Denim Shirt</ProdName>
-          <ProdDesc>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eligendi
-            cum distinctio voluptatibus deserunt possimus quam minima numquam
-            rem? Repudiandae, voluptatibus sunt. Autem nobis sit similique animi
-            nostrum perspiciatis, accusamus molestiae?
-          </ProdDesc>
-          <ProdPrice>$ 40</ProdPrice>
-          <Filter>
-            <ColorFilter>
-              <FilterText>Color: </FilterText>
-              <ColorSelect bg="blue" />
-              <ColorSelect bg="black" />
-              <ColorSelect bg="gray" />
-            </ColorFilter>
-            <SizeSelect>
-              <FilterText>Size: </FilterText>
-              <FilterSelector>
-                <FilterOption value={""}>XS</FilterOption>
-                <FilterOption value={""}>S</FilterOption>
-                <FilterOption value={""}>M</FilterOption>
-                <FilterOption value={""}>L</FilterOption>
-                <FilterOption value={""}>XL</FilterOption>
-              </FilterSelector>
-            </SizeSelect>
-          </Filter>
-          <BuyOption>
-            <QtyOptions>
-              <QtyOption>
-                <Add style={{ fontSize: "30px" }} />
-              </QtyOption>
-              <QtyValue>1</QtyValue>
-              <QtyOption>
-                <Remove style={{ fontSize: "30px" }} />
-              </QtyOption>
-            </QtyOptions>
-            <AddButton>ADD To CART</AddButton>
-          </BuyOption>
-        </ProdInfo>
+        {prod.map((prod) => {
+          return (
+            <>
+              <ProdImgContainer key={prod.id}>
+                <Img src={prod.img} />
+              </ProdImgContainer>
+              <ProdInfo>
+                <ProdName>{prod.name}</ProdName>
+                <ProdDesc>{prod.prodDesc}</ProdDesc>
+                <ProdPrice>$ {prod.price}</ProdPrice>
+                <Filter>
+                  <ColorFilter>
+                    <FilterText>Color: </FilterText>
+                    <ColorSelect
+                      bg="blue"
+                      onClick={() => {
+                        setColor("blue");
+                      }}
+                    />
+                    <ColorSelect
+                      bg="black"
+                      onClick={() => {
+                        setColor("black");
+                      }}
+                    />
+                    <ColorSelect
+                      bg="gray"
+                      onClick={() => {
+                        setColor("grey");
+                      }}
+                    />
+                  </ColorFilter>
+                  <SizeSelect>
+                    <FilterText>Size: </FilterText>
+                    <FilterSelector
+                      value={size}
+                      onChange={(e) => {
+                        setSize(e.target.value);
+                      }}>
+                      <FilterOption value={"xs"}>XS</FilterOption>
+                      <FilterOption value={"s"}>S</FilterOption>
+                      <FilterOption value={"m"}>M</FilterOption>
+                      <FilterOption value={"l"}>L</FilterOption>
+                      <FilterOption value={"xl"}>XL</FilterOption>
+                    </FilterSelector>
+                  </SizeSelect>
+                </Filter>
+                <BuyOption>
+                  <QtyOptions>
+                    <QtyOption>
+                      <Add
+                        style={{ fontSize: "30px" }}
+                        onClick={() => {
+                          console.log("add");
+                          handleCart("add");
+                        }}
+                      />
+                    </QtyOption>
+                    <QtyValue>{qty}</QtyValue>
+                    <QtyOption>
+                      <Remove
+                        style={{ fontSize: "30px" }}
+                        onClick={() => handleCart("remove")}
+                      />
+                    </QtyOption>
+                  </QtyOptions>
+                  <AddButton onClick={addToCart}>ADD To CART</AddButton>
+                </BuyOption>
+              </ProdInfo>
+            </>
+          );
+        })}
       </Wrapper>
     </Container>
   );

@@ -1,9 +1,10 @@
 import { Search, ShoppingCartOutlined } from "@mui/icons-material";
 import { Badge } from "@mui/material";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Annoucement from "../components/Annoucement";
+import { UserCart } from "./data";
 
 const Left = styled.div`
   flex: 1;
@@ -50,6 +51,7 @@ const Logo = styled.h2`
   font-family: "lora";
   font-style: italic;
   text-align: center;
+  cursor: pointer;
 `;
 const MenuItem = styled.span`
   margin-left: 10px;
@@ -95,6 +97,11 @@ const Container = styled.div`
 `;
 
 function NavBar() {
+  const navigate = useNavigate();
+  const [cart, setCart] = useState(UserCart.length);
+  useEffect(() => {
+    setCart(UserCart.length);
+  }, [UserCart.length]);
   return (
     <Container>
       <Wrapper>
@@ -106,13 +113,19 @@ function NavBar() {
           </SearchContainer>
         </Left>
         <Center>
-          <Logo className="logo">Basic React UI.</Logo>
+          <Logo
+            className="logo"
+            onClick={() => {
+              navigate("/");
+            }}>
+            Basic React UI.
+          </Logo>
         </Center>
         <Right>
           <MenuItem>REGISTER</MenuItem>
           <MenuItem>SIGNIN</MenuItem>
           <MenuItem>
-            <Badge badgeContent={4} color="primary">
+            <Badge badgeContent={cart} color="primary">
               <Link to="/cart">
                 <ShoppingCartOutlined color="action" />
               </Link>
